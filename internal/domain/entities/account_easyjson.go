@@ -39,7 +39,7 @@ func easyjson349b126bDecodeWBCloudInternalDomainEntities(in *jlexer.Lexer, out *
 		case "id":
 			out.Id = string(in.String())
 		case "balance":
-			out.Balance = int(in.Int())
+			out.Balance = float64(in.Float64())
 		default:
 			in.SkipRecursive()
 		}
@@ -62,7 +62,7 @@ func easyjson349b126bEncodeWBCloudInternalDomainEntities(out *jwriter.Writer, in
 	{
 		const prefix string = ",\"balance\":"
 		out.RawString(prefix)
-		out.Int(int(in.Balance))
+		out.Float64(float64(in.Balance))
 	}
 	out.RawByte('}')
 }

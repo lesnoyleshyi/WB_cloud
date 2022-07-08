@@ -7,8 +7,8 @@ import (
 )
 
 type Account struct {
-	Id      string `json:"id"`
-	Balance int    `json:"balance"`
+	Id      string  `json:"id"`
+	Balance float64 `json:"balance"`
 }
 
 // Currency represents every currency that respect rule:
