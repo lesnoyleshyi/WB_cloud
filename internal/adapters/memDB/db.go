@@ -41,97 +41,49 @@ func (d MemDb) Close(ctx context.Context) error {
 }
 
 func (d MemDb) Create(ctx context.Context, account entities.Account) error {
-	errCh := make(chan error)
+	d.mu.Lock()
+	defer d.mu.Unlock()
 
-	fn := func(entities.Account) {
-		d.mu.Lock()
-		defer d.mu.Unlock()
-
-		if _, ok := d.storage[account.Id]; ok {
-			errCh <- domainErrors.ErrAccountAlreadyExists
-			return
-		}
-
-		d.storage[account.Id] = &account
-
-		errCh <- nil
+	if _, ok := d.storage[account.Id]; ok {
+		return domainErrors.ErrAccountAlreadyExists
 	}
 
-	go fn(account)
+	d.storage[account.Id] = &account
 
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case err := <-errCh:
-		return err
-	}
+	return nil
 }
 
-func (d MemDb) GetBalance(ctx context.Context, account entities.Account) (int, error) {
-	type res struct {
-		balance int
-		err     error
-	}
-	ch := make(chan res)
+func (d MemDb) GetBalance(ctx context.Context, account entities.Account) (float64, error) {
+	var ok bool
+	var acc *entities.Account
 
-	fn := func() {
-		var ok bool
-		var acc *entities.Account
+	d.mu.RLock()
+	defer d.mu.RUnlock()
 
-		d.mu.RLock()
-		defer d.mu.RUnlock()
-
-		if acc, ok = d.storage[account.Id]; !ok {
-			ch <- res{balance: 0, err: domainErrors.ErrNoSuchAccount}
-			return
-		}
-
-		ch <- res{balance: acc.Balance, err: nil}
+	if acc, ok = d.storage[account.Id]; !ok {
+		return 0, domainErrors.ErrNoSuchAccount
 	}
 
-	go fn()
-
-	select {
-	case <-ctx.Done():
-		return 0, ctx.Err()
-	case ret := <-ch:
-		return ret.balance, ret.err
-	}
+	return acc.Balance, nil
 }
 
-func (d MemDb) Transfer(ctx context.Context, from entities.Account, to entities.Account, amount int) error {
-	errCh := make(chan error)
+func (d MemDb) Transfer(ctx context.Context, from entities.Account, to entities.Account, amount float64) error {
+	d.mu.Lock()
+	defer d.mu.Unlock()
 
-	fn := func() {
-		d.mu.Lock()
-		defer d.mu.Unlock()
-
-		if _, ok := d.storage[from.Id]; !ok {
-			errCh <- domainErrors.ErrNoSuchAccount
-			return
-		}
-		if _, ok := d.storage[to.Id]; !ok {
-			errCh <- domainErrors.ErrNoSuchAccount
-			return
-		}
-
-		if from.Balance < amount {
-			errCh <- domainErrors.ErrNoEnoughMoney
-			return
-		}
-
-		d.storage[from.Id].Balance -= amount
-		d.storage[to.Id].Balance += amount
-
-		errCh <- nil
+	if _, ok := d.storage[from.Id]; !ok {
+		return domainErrors.ErrNoSuchAccount
+	}
+	if _, ok := d.storage[to.Id]; !ok {
+		return domainErrors.ErrNoSuchAccount
 	}
 
-	go fn()
-
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case err := <-errCh:
-		return err
+	if d.storage[from.Id].Balance < amount {
+		return domainErrors.ErrNoEnoughMoney
 	}
+
+	d.storage[from.Id].Balance -= amount
+	d.storage[to.Id].Balance += amount
+
+	return nil
 }
