@@ -70,11 +70,11 @@ func (a HttpAdapter) getBalance(w http.ResponseWriter, r *http.Request) {
 
 	balance, err := a.accounts.GetBalance(ctx, account)
 	if err != nil {
-		a.respondError(w, fmt.Sprintf("can't get balance for accoun with id %s", id),
+		a.respondError(w, fmt.Sprintf("can't get balance for account with id %s", id),
 			http.StatusInternalServerError, err)
 		return
 	}
 
-	a.respondSuccess(w, fmt.Sprintf("account's balance wit id %s is %d", id, balance),
+	a.respondSuccess(w, fmt.Sprintf("account's balance with id %s is %d", id, balance),
 		http.StatusOK)
 }
