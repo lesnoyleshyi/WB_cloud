@@ -108,13 +108,16 @@ func (d MemDb) Transfer(ctx context.Context, from entities.Account, to entities.
 
 		if _, ok := d.storage[from.Id]; !ok {
 			errCh <- domainErrors.ErrNoSuchAccount
+			return
 		}
 		if _, ok := d.storage[to.Id]; !ok {
 			errCh <- domainErrors.ErrNoSuchAccount
+			return
 		}
 
 		if from.Balance < amount {
 			errCh <- domainErrors.ErrNoEnoughMoney
+			return
 		}
 
 		d.storage[from.Id].Balance -= amount
