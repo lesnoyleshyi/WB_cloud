@@ -13,7 +13,7 @@ get_balance:
 
 transfer:
 	curl -X POST localhost:8080/transfer -d \
-				'{"from": "uuid_user_2", "to": "uuid_user_1", "amount": 0.2}'
+    				'{"from": "uuid_user_2", "to": "uuid_user_1", "amount": 0.2}'
 
 transfer_1000:
 	for run in {1..1000}; do make transfer &>/dev/null ; done

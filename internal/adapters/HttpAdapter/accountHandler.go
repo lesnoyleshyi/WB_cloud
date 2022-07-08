@@ -75,6 +75,6 @@ func (a HttpAdapter) getBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a.respondSuccess(w, fmt.Sprintf("account's balance with id %s is %.3f", id, balance),
+	a.respondSuccess(w, fmt.Sprintf("account's balance with id %s is %d", id, balance),
 		http.StatusOK)
 }
