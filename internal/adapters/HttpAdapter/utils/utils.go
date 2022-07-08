@@ -7,9 +7,9 @@ import (
 )
 
 type transferParams struct {
-	From   string `json:"from"`
-	To     string `json:"to"`
-	Amount int    `json:"amount"`
+	From   string  `json:"from"`
+	To     string  `json:"to"`
+	Amount float64 `json:"amount"`
 }
 
 func GetAccount(r io.ReadCloser) (*entities.Account, error) {
@@ -23,7 +23,7 @@ func GetAccount(r io.ReadCloser) (*entities.Account, error) {
 	return &account, nil
 }
 
-func GetTransferParams(r io.ReadCloser) (from, to string, amount int, err error) {
+func GetTransferParams(r io.ReadCloser) (from, to string, amount float64, err error) {
 	var params transferParams
 
 	defer func() { _ = r.Close() }()

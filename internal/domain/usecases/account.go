@@ -18,10 +18,10 @@ func (a AccountService) Create(ctx context.Context, account entities.Account) er
 	return a.storage.Create(ctx, account)
 }
 
-func (a AccountService) GetBalance(ctx context.Context, account entities.Account) (balance int, err error) {
+func (a AccountService) GetBalance(ctx context.Context, account entities.Account) (balance float64, err error) {
 	return a.storage.GetBalance(ctx, account)
 }
 
-func (a AccountService) Transfer(ctx context.Context, from entities.Account, to entities.Account, amount int) error {
+func (a AccountService) Transfer(ctx context.Context, from entities.Account, to entities.Account, amount float64) error {
 	return a.storage.Transfer(ctx, from, to, amount)
 }

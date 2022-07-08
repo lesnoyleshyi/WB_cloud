@@ -41,7 +41,7 @@ func easyjson79a3de99DecodeWBCloudInternalAdaptersHttpAdapterUtils(in *jlexer.Le
 		case "to":
 			out.To = string(in.String())
 		case "amount":
-			out.Amount = int(in.Int())
+			out.Amount = float64(in.Float64())
 		default:
 			in.SkipRecursive()
 		}
@@ -69,7 +69,7 @@ func easyjson79a3de99EncodeWBCloudInternalAdaptersHttpAdapterUtils(out *jwriter.
 	{
 		const prefix string = ",\"amount\":"
 		out.RawString(prefix)
-		out.Int(int(in.Amount))
+		out.Float64(float64(in.Amount))
 	}
 	out.RawByte('}')
 }

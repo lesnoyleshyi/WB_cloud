@@ -53,7 +53,7 @@ func (d MemDb) Create(ctx context.Context, account entities.Account) error {
 	return nil
 }
 
-func (d MemDb) GetBalance(ctx context.Context, account entities.Account) (int, error) {
+func (d MemDb) GetBalance(ctx context.Context, account entities.Account) (float64, error) {
 	var ok bool
 	var acc *entities.Account
 
@@ -67,7 +67,7 @@ func (d MemDb) GetBalance(ctx context.Context, account entities.Account) (int, e
 	return acc.Balance, nil
 }
 
-func (d MemDb) Transfer(ctx context.Context, from entities.Account, to entities.Account, amount int) error {
+func (d MemDb) Transfer(ctx context.Context, from entities.Account, to entities.Account, amount float64) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
@@ -77,10 +77,9 @@ func (d MemDb) Transfer(ctx context.Context, from entities.Account, to entities.
 	if _, ok := d.storage[to.Id]; !ok {
 		return domainErrors.ErrNoSuchAccount
 	}
+
 	if d.storage[from.Id].Balance < amount {
 		return domainErrors.ErrNoEnoughMoney
-
-	}
 
 	d.storage[from.Id].Balance -= amount
 	d.storage[to.Id].Balance += amount
