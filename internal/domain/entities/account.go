@@ -62,4 +62,6 @@ func (c Currency) Add(value Currency) Currency {
 	} else {
 		result.Drobnaya = dr
 	}
+
+	return result
 }
