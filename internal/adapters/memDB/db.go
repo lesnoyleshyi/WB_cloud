@@ -49,6 +49,7 @@ func (d MemDb) Create(ctx context.Context, account entities.Account) error {
 
 		if _, ok := d.storage[account.Id]; ok {
 			errCh <- domainErrors.ErrAccountAlreadyExists
+			return
 		}
 
 		d.storage[account.Id] = &account
