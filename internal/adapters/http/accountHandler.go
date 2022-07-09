@@ -1,11 +1,12 @@
 package HttpAdapter
 
 import (
-	"WB_cloud/internal/adapters/HttpAdapter/utils"
+	"WB_cloud/internal/adapters/http/utils"
 	"WB_cloud/internal/domain/entities"
 	"context"
 	"fmt"
 	"github.com/go-chi/chi/v5"
+	"github.com/shopspring/decimal"
 	"net/http"
 )
 
@@ -45,8 +46,8 @@ func (a HttpAdapter) transfer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	from := entities.Account{Id: fromId, Balance: 0}
-	to := entities.Account{Id: toId, Balance: 0}
+	from := entities.Account{Id: fromId, Balance: decimal.Decimal{}}
+	to := entities.Account{Id: toId, Balance: decimal.Decimal{}}
 
 	if err := a.accounts.Transfer(ctx, from, to, amount); err != nil {
 		a.respondError(w, "can't make transfer", http.StatusInternalServerError, err)
@@ -66,7 +67,7 @@ func (a HttpAdapter) getBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	account := entities.Account{Id: id, Balance: 0}
+	account := entities.Account{Id: id, Balance: decimal.Decimal{}}
 
 	balance, err := a.accounts.GetBalance(ctx, account)
 	if err != nil {
@@ -75,6 +76,6 @@ func (a HttpAdapter) getBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a.respondSuccess(w, fmt.Sprintf("account's balance with id %s is %d", id, balance),
+	a.respondSuccess(w, fmt.Sprintf("account's balance with id %s is %s", id, balance),
 		http.StatusOK)
 }

@@ -3,13 +3,14 @@ package utils
 import (
 	"WB_cloud/internal/domain/entities"
 	"github.com/mailru/easyjson"
+	"github.com/shopspring/decimal"
 	"io"
 )
 
 type transferParams struct {
-	From   string  `json:"from"`
-	To     string  `json:"to"`
-	Amount float64 `json:"amount"`
+	From   string          `json:"from"`
+	To     string          `json:"to"`
+	Amount decimal.Decimal `json:"amount"`
 }
 
 func GetAccount(r io.ReadCloser) (*entities.Account, error) {
@@ -23,12 +24,12 @@ func GetAccount(r io.ReadCloser) (*entities.Account, error) {
 	return &account, nil
 }
 
-func GetTransferParams(r io.ReadCloser) (from, to string, amount float64, err error) {
+func GetTransferParams(r io.ReadCloser) (from, to string, amount decimal.Decimal, err error) {
 	var params transferParams
 
 	defer func() { _ = r.Close() }()
 	if err := easyjson.UnmarshalFromReader(r, &params); err != nil {
-		return "", "", 0, err
+		return "", "", decimal.Decimal{}, err
 	}
 
 	return params.From, params.To, params.Amount, nil

@@ -4,6 +4,7 @@ import (
 	"WB_cloud/internal/domain/entities"
 	domainErrors "WB_cloud/internal/domain/errors"
 	"context"
+	"github.com/shopspring/decimal"
 	"sync"
 )
 
@@ -53,7 +54,7 @@ func (d MemDb) Create(ctx context.Context, account entities.Account) error {
 	return nil
 }
 
-func (d MemDb) GetBalance(ctx context.Context, account entities.Account) (float64, error) {
+func (d MemDb) GetBalance(ctx context.Context, account entities.Account) (decimal.Decimal, error) {
 	var ok bool
 	var acc *entities.Account
 
@@ -61,13 +62,13 @@ func (d MemDb) GetBalance(ctx context.Context, account entities.Account) (float6
 	defer d.mu.RUnlock()
 
 	if acc, ok = d.storage[account.Id]; !ok {
-		return 0, domainErrors.ErrNoSuchAccount
+		return decimal.Decimal{}, domainErrors.ErrNoSuchAccount
 	}
 
 	return acc.Balance, nil
 }
 
-func (d MemDb) Transfer(ctx context.Context, from entities.Account, to entities.Account, amount float64) error {
+func (d MemDb) Transfer(ctx context.Context, from entities.Account, to entities.Account, amount decimal.Decimal) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
@@ -78,11 +79,12 @@ func (d MemDb) Transfer(ctx context.Context, from entities.Account, to entities.
 		return domainErrors.ErrNoSuchAccount
 	}
 
-	if d.storage[from.Id].Balance < amount {
+	if d.storage[from.Id].Balance.LessThan(amount) {
 		return domainErrors.ErrNoEnoughMoney
+	}
 
-	d.storage[from.Id].Balance -= amount
-	d.storage[to.Id].Balance += amount
+	d.storage[from.Id].Balance = d.storage[from.Id].Balance.Sub(amount)
+	d.storage[to.Id].Balance = d.storage[to.Id].Balance.Add(amount)
 
 	return nil
 }

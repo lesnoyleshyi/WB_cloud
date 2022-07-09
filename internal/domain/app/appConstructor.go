@@ -1,7 +1,7 @@
 package app
 
 import (
-	"WB_cloud/internal/adapters/HttpAdapter"
+	"WB_cloud/internal/adapters/http"
 	"WB_cloud/internal/domain/usecases"
 	"context"
 	"flag"
